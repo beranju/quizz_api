@@ -132,6 +132,15 @@ func UpdateQuizController(ctx echo.Context) error {
 	exisitingQuiz.Description = quiz.Description
 	exisitingQuiz.Duration = quiz.Duration
 
+	if err := config.DB.Save(&exisitingQuiz).Error; err != nil {
+		response := response.ErrorResponse{
+			Status:  "error",
+			Message: "Quiz Update Failed",
+			Error:   err.Error(),
+		}
+		return echo.NewHTTPError(http.StatusInternalServerError, response)
+	}
+
 	response := response.SuccessResponse{
 		Status:  "success",
 		Message: "Quiz Updated successfully",
