@@ -81,7 +81,7 @@ func GetQuestionController(ctx echo.Context) error {
 	questionId := ctx.Param("questionId")
 	existingQuestion := new(models.Question)
 
-	if err := db.Where("ID = ? && quiz_id = ?", questionId, quizId).First(&existingQuestion, &quizId, &questionId).Error; err != nil {
+	if err := db.Where("ID = ? AND quiz_id = ?", questionId, quizId).First(&existingQuestion, &quizId, &questionId).Error; err != nil {
 		response := response.ErrorResponse{
 			Status:  "error",
 			Message: "Failed to retrieve Question",
@@ -127,7 +127,7 @@ func UpdateQuestionController(ctx echo.Context) error {
 
 	existingQuestion := new(models.Question)
 
-	if err := db.Where("ID = ? && quiz_id = ?", questionId, quizId).First(&existingQuestion, questionId, quizId).Error; err != nil {
+	if err := db.Where("ID = ? AND quiz_id = ?", questionId, quizId).First(&existingQuestion, questionId, quizId).Error; err != nil {
 		response := response.ErrorResponse{
 			Status:  "error",
 			Message: "Question Update Failed",
@@ -170,7 +170,7 @@ func DeleteQuestionController(ctx echo.Context) error {
 	quizId := ctx.Param("quizId")
 	question := new(models.Question)
 
-	if err := db.Where("ID = ? && quiz_id = ?", questionId, quizId).Delete(&question, questionId, quizId).Error; err != nil {
+	if err := db.Where("ID = ? AND quiz_id = ?", questionId, quizId).Delete(&question, questionId, quizId).Error; err != nil {
 		response := response.ErrorResponse{
 			Status:  "error",
 			Message: "Question Delete Failed",

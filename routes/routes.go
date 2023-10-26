@@ -27,5 +27,9 @@ func New() *echo.Echo {
 	questionRoutes.POST("/", controller.CreateQuestionController)
 	questionRoutes.PUT("/:questionId", controller.UpdateQuestionController)
 	questionRoutes.DELETE("/:questionId", controller.DeleteQuestionController)
+
+	quizResultRoutes := e.Group("/users/:user_id/quizzes/:quiz_id/result")
+	quizResultRoutes.GET("/", controller.GetQuizResultController)
+	quizResultRoutes.POST("/", controller.AddQuizResultController)
 	return e
 }
