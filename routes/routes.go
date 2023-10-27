@@ -22,9 +22,10 @@ func New() *echo.Echo {
 	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
 
 	userRoutes := e.Group("/users")
-	userRoutes.GET("/:id", controller.GetUserController)
-	userRoutes.POST("/", controller.PostUserController)
-	userRoutes.PUT("/:id", controller.UpdateUserController)
+	// userRoutes.GET("/:id", controller.GetUserDetailController)
+	userRoutes.POST("/register", controller.RegisterController)
+	userRoutes.POST("/login", controller.LoginController)
+	userRoutes.PUT("/update/:id", controller.UpdateUserController)
 
 	quizRoutes := e.Group("/quizzes")
 	quizRoutes.GET("/", controller.GetQuizzesController)
