@@ -2,12 +2,24 @@ package routes
 
 import (
 	"main/controller"
+	"time"
 
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 func New() *echo.Echo {
+
+	// ref := "https://github.dev/cjaewon/echo-gorm-example"
 	e := echo.New()
+
+	// implement middleware
+	e.Use(middleware.Logger())
+	e.Pre(middleware.RemoveTrailingSlash())
+	e.Use(middleware.TimeoutWithConfig(middleware.TimeoutConfig{
+		Timeout: 30 * time.Second,
+	}))
+	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
 
 	userRoutes := e.Group("/users")
 	userRoutes.GET("/:id", controller.GetUserController)
