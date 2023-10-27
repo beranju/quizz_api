@@ -5,6 +5,7 @@ import (
 	"main/models"
 	"main/models/response"
 	"main/repositories"
+	"main/utils"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -42,6 +43,9 @@ func RegisterController(c echo.Context) error {
 		}
 		return echo.NewHTTPError(http.StatusBadRequest, response)
 	}
+
+	hash, _ := utils.HashAndSalt([]byte(user.Password))
+	user.Password = hash
 
 	err := repositories.Register(&user)
 	if err != nil {
@@ -108,7 +112,8 @@ func LoginController(ctx echo.Context) error {
 	var user models.User
 	ctx.Bind(&user)
 
-	err := repositories.Login(&user)
+	var existingUser models.User
+	err := repositories.Login(&existingUser, user.Email)
 	if err != nil {
 		response := response.BaseResponse{
 			Status:  "error",
@@ -116,7 +121,16 @@ func LoginController(ctx echo.Context) error {
 		}
 		return ctx.JSON(http.StatusBadRequest, response)
 	}
-	token, err := middlewares.GenerateToken(int(user.ID), user.Name)
+
+	if passwordMatch := utils.ComparePassword(existingUser.Password, []byte(user.Password)); passwordMatch == false {
+		response := response.BaseResponse{
+			Status:  "error",
+			Message: "Password mismatch",
+		}
+		return ctx.JSON(http.StatusUnauthorized, response)
+	}
+
+	token, err := middlewares.GenerateToken(int(existingUser.ID), existingUser.Name)
 	if err != nil {
 		response := response.BaseResponse{
 			Status:  "error",
@@ -125,13 +139,13 @@ func LoginController(ctx echo.Context) error {
 		return ctx.JSON(http.StatusInternalServerError, response)
 	}
 	var userResponse response.UserResponse
-	userResponse.Id = int(user.ID)
-	userResponse.Name = user.Name
-	userResponse.Email = user.Email
-	userResponse.ImageUrl = user.ImageUrl
+	userResponse.Id = int(existingUser.ID)
+	userResponse.Name = existingUser.Name
+	userResponse.Email = existingUser.Email
+	userResponse.ImageUrl = existingUser.ImageUrl
 	userResponse.Token = token
-	userResponse.CreatedAt = user.CreatedAt
-	userResponse.UpdatedAt = user.UpdatedAt
+	userResponse.CreatedAt = existingUser.CreatedAt
+	userResponse.UpdatedAt = existingUser.UpdatedAt
 
 	response := response.BaseResponse{
 		Status:  "success",

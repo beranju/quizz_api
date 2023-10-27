@@ -20,7 +20,7 @@ func Register(user *models.User) error {
 	return result.Error
 }
 
-func Login(user *models.User) error {
-	result := config.DB.Where("email = ? AND password = ?", user.Email, user.Password).First(user)
+func Login(user *models.User, email string) error {
+	result := config.DB.Where("email = ?", email).First(user)
 	return result.Error
 }
