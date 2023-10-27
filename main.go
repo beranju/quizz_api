@@ -13,5 +13,6 @@ func main() {
 	e := routes.New()
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.Timeout())
+	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
 	e.Logger.Fatal(e.Start(":8080"))
 }
