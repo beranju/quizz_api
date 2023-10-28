@@ -1,26 +1,27 @@
 package controller
 
 import (
-	"main/config"
 	"main/models"
 	"main/models/response"
+	"main/repositories"
 	"net/http"
+	"strconv"
 
-	"github.com/go-playground/validator/v10"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 func GetQuizzesController(c echo.Context) error {
 	var quizzes []models.Quiz
-	if err := config.DB.Find(&quizzes).Error; err != nil {
-		response := response.ErrorResponse{
+
+	if err := repositories.FindQuiz(&quizzes); err != nil {
+		response := response.BaseResponse{
 			Status:  "error",
 			Message: "Failed to retrieve quizzes",
-			Error:   err.Error(),
 		}
 		return c.JSON(http.StatusInternalServerError, response)
 	}
-	response := response.SuccessResponse{
+
+	response := response.BaseResponse{
 		Status:  "success",
 		Message: "Quizzes retrieved successfully",
 		Data:    quizzes,
@@ -29,40 +30,26 @@ func GetQuizzesController(c echo.Context) error {
 }
 
 func CreateQuizController(ctx echo.Context) error {
-	db := config.DB
-	validator := validator.New()
 	quiz := new(models.Quiz)
 
 	// bind data
 	if err := ctx.Bind(&quiz); err != nil {
-		response := response.ErrorResponse{
+		response := response.BaseResponse{
 			Status:  "error",
-			Message: "Quiz Creation Failed",
-			Error:   err.Error(),
+			Message: "Check your data",
 		}
 		return ctx.JSON(http.StatusBadRequest, response)
 	}
 
-	// validate the quiz sturct
-	if err := validator.Struct(quiz); err != nil {
-		response := response.ErrorResponse{
+	if err := repositories.CreateQuiz(quiz); err != nil {
+		response := response.BaseResponse{
 			Status:  "error",
 			Message: "Quiz Creation Failed",
-			Error:   err.Error(),
-		}
-		return ctx.JSON(http.StatusBadRequest, response)
-	}
-
-	if err := db.Create(&quiz).Error; err != nil {
-		response := response.ErrorResponse{
-			Status:  "error",
-			Message: "Quiz Creation Failed",
-			Error:   err.Error(),
 		}
 		return ctx.JSON(http.StatusInternalServerError, response)
 	}
 
-	response := response.SuccessResponse{
+	response := response.BaseResponse{
 		Status:  "success",
 		Message: "Quiz Created successfully",
 		Data:    quiz,
@@ -73,18 +60,19 @@ func CreateQuizController(ctx echo.Context) error {
 }
 
 func GetQuizController(ctx echo.Context) error {
-	db := config.DB
-	id := ctx.Param("id")
+	idString := ctx.Param("id")
+	id, _ := strconv.Atoi(idString)
 	exisitingQuiz := new(models.Quiz)
-	if err := db.First(&exisitingQuiz, id).Error; err != nil {
-		response := response.ErrorResponse{
+
+	if err := repositories.FindQuizById(exisitingQuiz, id); err != nil {
+		response := response.BaseResponse{
 			Status:  "error",
-			Message: "Failed to retrieve quiz",
-			Error:   err.Error(),
+			Message: "Quiz not found",
 		}
-		return ctx.JSON(http.StatusInternalServerError, response)
+		return ctx.JSON(http.StatusNotFound, response)
 	}
-	response := response.SuccessResponse{
+
+	response := response.BaseResponse{
 		Status:  "success",
 		Message: "Quiz retrieved successfully",
 		Data:    exisitingQuiz,
@@ -93,55 +81,42 @@ func GetQuizController(ctx echo.Context) error {
 }
 
 func UpdateQuizController(ctx echo.Context) error {
-	db := config.DB
-	validator := validator.New()
-	id := ctx.Param("id")
+	idString := ctx.Param("id")
+	id, _ := strconv.Atoi(idString)
 	quiz := new(models.Quiz)
 
 	// bind data
 	if err := ctx.Bind(quiz); err != nil {
-		response := response.ErrorResponse{
+		response := response.BaseResponse{
 			Status:  "error",
-			Message: "Quiz Update Failed",
-			Error:   err.Error(),
-		}
-		return echo.NewHTTPError(http.StatusBadRequest, response)
-	}
-	// validate the quiz sturct
-	if err := validator.Struct(quiz); err != nil {
-		response := response.ErrorResponse{
-			Status:  "error",
-			Message: "Quiz Update Failed",
-			Error:   err.Error(),
+			Message: "Check you data",
 		}
 		return echo.NewHTTPError(http.StatusBadRequest, response)
 	}
 
 	exisitingQuiz := new(models.Quiz)
 
-	if err := db.First(&exisitingQuiz, id).Error; err != nil {
-		response := response.ErrorResponse{
+	if err := repositories.FindQuizById(exisitingQuiz, id); err != nil {
+		response := response.BaseResponse{
 			Status:  "error",
-			Message: "Quiz Update Failed",
-			Error:   err.Error(),
+			Message: "Quiz not found",
 		}
-		return echo.NewHTTPError(http.StatusInternalServerError, response)
+		return echo.NewHTTPError(http.StatusNotFound, response)
 	}
 
 	exisitingQuiz.QuizName = quiz.QuizName
 	exisitingQuiz.Description = quiz.Description
 	exisitingQuiz.Duration = quiz.Duration
 
-	if err := config.DB.Save(&exisitingQuiz).Error; err != nil {
-		response := response.ErrorResponse{
+	if err := repositories.SaveQuiz(quiz); err != nil {
+		response := response.BaseResponse{
 			Status:  "error",
 			Message: "Quiz Update Failed",
-			Error:   err.Error(),
 		}
 		return echo.NewHTTPError(http.StatusInternalServerError, response)
 	}
 
-	response := response.SuccessResponse{
+	response := response.BaseResponse{
 		Status:  "success",
 		Message: "Quiz Updated successfully",
 		Data:    exisitingQuiz,
@@ -151,19 +126,18 @@ func UpdateQuizController(ctx echo.Context) error {
 }
 
 func DeleteQuizController(ctx echo.Context) error {
-	db := config.DB
-	id := ctx.Param("id")
+	idString := ctx.Param("id")
+	id, _ := strconv.Atoi(idString)
 	quiz := new(models.Quiz)
 
-	if err := db.Delete(&quiz, id).Error; err != nil {
-		response := response.ErrorResponse{
+	if err := repositories.DeleteQuiz(quiz, id); err != nil {
+		response := response.BaseResponse{
 			Status:  "error",
 			Message: "Quiz Delete Failed",
-			Error:   err.Error(),
 		}
 		return echo.NewHTTPError(http.StatusInternalServerError, response)
 	}
-	response := response.SuccessResponse{
+	response := response.BaseResponse{
 		Status:  "success",
 		Message: "Quiz Deleted successfully",
 		Data:    nil,

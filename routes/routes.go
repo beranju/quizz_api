@@ -2,8 +2,10 @@ package routes
 
 import (
 	"main/controller"
+	"os"
 	"time"
 
+	"github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -21,28 +23,26 @@ func New() *echo.Echo {
 	}))
 	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
 
-	userRoutes := e.Group("/users")
-	// userRoutes.GET("/:id", controller.GetUserDetailController)
-	userRoutes.POST("/register", controller.RegisterController)
-	userRoutes.POST("/login", controller.LoginController)
-	userRoutes.PUT("/update/:id", controller.UpdateUserController)
+	eAuth := e.Group("")
+	e.Use(echojwt.JWT([]byte(os.Getenv("JWT_SECRET_KEY"))))
 
-	quizRoutes := e.Group("/quizzes")
-	quizRoutes.GET("/", controller.GetQuizzesController)
-	quizRoutes.POST("/", controller.CreateQuizController)
-	quizRoutes.PUT("/:id", controller.UpdateQuizController)
-	quizRoutes.GET("/:id", controller.GetQuizController)
-	quizRoutes.DELETE("/:id", controller.DeleteQuizController)
+	e.POST("/users/register", controller.RegisterController)
+	e.POST("/users/login", controller.LoginController)
+	eAuth.PUT("/users/update/:id", controller.UpdateUserController)
 
-	questionRoutes := e.Group("/quizzes/:quizId/questions")
-	questionRoutes.GET("/", controller.GetAllQuestionController)
-	questionRoutes.GET("/:questionId", controller.GetQuestionController)
-	questionRoutes.POST("/", controller.CreateQuestionController)
-	questionRoutes.PUT("/:questionId", controller.UpdateQuestionController)
-	questionRoutes.DELETE("/:questionId", controller.DeleteQuestionController)
+	eAuth.GET("/quizzes", controller.GetQuizzesController)
+	eAuth.POST("/quizzes", controller.CreateQuizController)
+	eAuth.PUT("/quizzes/:id", controller.UpdateQuizController)
+	eAuth.GET("/quizzes/:id", controller.GetQuizController)
+	eAuth.DELETE("/quizzes/:id", controller.DeleteQuizController)
 
-	quizResultRoutes := e.Group("/users/:user_id/quizzes/:quiz_id/result")
-	quizResultRoutes.GET("/", controller.GetQuizResultController)
-	quizResultRoutes.POST("/", controller.AddQuizResultController)
+	eAuth.GET("/quizzes/:quizId/questions", controller.GetAllQuestionController)
+	eAuth.GET("/quizzes/:quizId/questions/:questionId", controller.GetQuestionController)
+	eAuth.POST("/quizzes/:quizId/questions", controller.CreateQuestionController)
+	eAuth.PUT("/quizzes/:quizId/questions/:questionId", controller.UpdateQuestionController)
+	eAuth.DELETE("/quizzes/:quizId/questions/:questionId", controller.DeleteQuestionController)
+
+	eAuth.GET("/quizzes/:quiz_id/result", controller.GetQuizResultController)
+	eAuth.POST("/quizzes/:quiz_id/result", controller.AddQuizResultController)
 	return e
 }
