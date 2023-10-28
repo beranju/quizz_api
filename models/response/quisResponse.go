@@ -1,12 +1,14 @@
 package response
 
 import (
-	"main/models"
+	"time"
 )
 
 type QuizResponse struct {
-	QuizName    string `json:"quiz_name" form:"quiz_name"`
-	Description string `json:"description" form:"description"`
-	Duration    int64  `json:"duration" form:"duration"`
-	Questions   []models.Question
+	ID          uint `gorm:"primaryKey"`
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	QuizName    string `json:"quiz_name"`
+	Description string `json:"description"`
+	Duration    int64  `json:"duration"`
 }

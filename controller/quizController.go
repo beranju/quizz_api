@@ -13,7 +13,8 @@ import (
 func GetQuizzesController(c echo.Context) error {
 	var quizzes []models.Quiz
 
-	if err := repositories.FindQuiz(&quizzes); err != nil {
+	err := repositories.FindQuiz(&quizzes)
+	if err != nil {
 		response := response.BaseResponse{
 			Status:  "error",
 			Message: "Failed to retrieve quizzes",
@@ -21,10 +22,24 @@ func GetQuizzesController(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, response)
 	}
 
+	var quizResponses []response.QuizResponse
+
+	for _, quiz := range quizzes {
+		quizResponse := response.QuizResponse{
+			ID:          quiz.ID,
+			CreatedAt:   quiz.CreatedAt,
+			UpdatedAt:   quiz.UpdatedAt,
+			QuizName:    quiz.QuizName,
+			Description: quiz.Description,
+			Duration:    quiz.Duration,
+		}
+		quizResponses = append(quizResponses, quizResponse)
+	}
+
 	response := response.BaseResponse{
 		Status:  "success",
 		Message: "Quizzes retrieved successfully",
-		Data:    quizzes,
+		Data:    quizResponses,
 	}
 	return c.JSON(http.StatusOK, response)
 }
@@ -49,10 +64,19 @@ func CreateQuizController(ctx echo.Context) error {
 		return ctx.JSON(http.StatusInternalServerError, response)
 	}
 
+	quizResponse := response.QuizResponse{
+		ID:          quiz.ID,
+		CreatedAt:   quiz.CreatedAt,
+		UpdatedAt:   quiz.UpdatedAt,
+		QuizName:    quiz.QuizName,
+		Description: quiz.Description,
+		Duration:    quiz.Duration,
+	}
+
 	response := response.BaseResponse{
 		Status:  "success",
 		Message: "Quiz Created successfully",
-		Data:    quiz,
+		Data:    quizResponse,
 	}
 
 	return ctx.JSON(http.StatusOK, response)
@@ -62,9 +86,9 @@ func CreateQuizController(ctx echo.Context) error {
 func GetQuizController(ctx echo.Context) error {
 	idString := ctx.Param("id")
 	id, _ := strconv.Atoi(idString)
-	exisitingQuiz := new(models.Quiz)
+	quiz := new(models.Quiz)
 
-	if err := repositories.FindQuizById(exisitingQuiz, id); err != nil {
+	if err := repositories.QuizJoinQuesion(quiz, id); err != nil {
 		response := response.BaseResponse{
 			Status:  "error",
 			Message: "Quiz not found",
@@ -75,7 +99,7 @@ func GetQuizController(ctx echo.Context) error {
 	response := response.BaseResponse{
 		Status:  "success",
 		Message: "Quiz retrieved successfully",
-		Data:    exisitingQuiz,
+		Data:    quiz,
 	}
 	return ctx.JSON(http.StatusOK, response)
 }
@@ -116,10 +140,19 @@ func UpdateQuizController(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, response)
 	}
 
+	quizResponse := response.QuizResponse{
+		ID:          exisitingQuiz.ID,
+		CreatedAt:   exisitingQuiz.CreatedAt,
+		UpdatedAt:   exisitingQuiz.UpdatedAt,
+		QuizName:    exisitingQuiz.QuizName,
+		Description: exisitingQuiz.Description,
+		Duration:    exisitingQuiz.Duration,
+	}
+
 	response := response.BaseResponse{
 		Status:  "success",
 		Message: "Quiz Updated successfully",
-		Data:    exisitingQuiz,
+		Data:    quizResponse,
 	}
 
 	return ctx.JSON(http.StatusOK, response)

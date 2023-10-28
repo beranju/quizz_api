@@ -29,3 +29,9 @@ func DeleteQuiz(quiz *models.Quiz, id int) error {
 	result := config.DB.Delete(&quiz, id)
 	return result.Error
 }
+
+func QuizJoinQuesion(quiz *models.Quiz, quizId int) error {
+
+	result := config.DB.Preload("Question").Where("quizzes.ID = ?", quizId).Take(&quiz)
+	return result.Error
+}
