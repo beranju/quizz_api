@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 )
 
@@ -45,10 +46,19 @@ func GetQuizzesController(c echo.Context) error {
 }
 
 func CreateQuizController(ctx echo.Context) error {
+	validator := validator.New()
 	quiz := new(models.Quiz)
 
 	// bind data
 	if err := ctx.Bind(&quiz); err != nil {
+		response := response.BaseResponse{
+			Status:  "error",
+			Message: "Check your data",
+		}
+		return ctx.JSON(http.StatusBadRequest, response)
+	}
+
+	if err := validator.Struct(&quiz); err != nil {
 		response := response.BaseResponse{
 			Status:  "error",
 			Message: "Check your data",
@@ -105,6 +115,7 @@ func GetQuizController(ctx echo.Context) error {
 }
 
 func UpdateQuizController(ctx echo.Context) error {
+	validator := validator.New()
 	idString := ctx.Param("id")
 	id, _ := strconv.Atoi(idString)
 	quiz := new(models.Quiz)
@@ -116,6 +127,14 @@ func UpdateQuizController(ctx echo.Context) error {
 			Message: "Check you data",
 		}
 		return echo.NewHTTPError(http.StatusBadRequest, response)
+	}
+
+	if err := validator.Struct(&quiz); err != nil {
+		response := response.BaseResponse{
+			Status:  "error",
+			Message: "Check your data",
+		}
+		return ctx.JSON(http.StatusBadRequest, response)
 	}
 
 	exisitingQuiz := new(models.Quiz)
