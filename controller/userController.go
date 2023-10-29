@@ -8,6 +8,7 @@ import (
 	"main/utils"
 	"net/http"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 )
 
@@ -35,6 +36,7 @@ func GetUserDetailController(c echo.Context) error {
 }
 
 func RegisterController(c echo.Context) error {
+	validator := validator.New()
 	var user models.User
 	if err := c.Bind(&user); err != nil {
 		response := response.BaseResponse{
@@ -42,6 +44,14 @@ func RegisterController(c echo.Context) error {
 			Message: "Cek the user data",
 		}
 		return echo.NewHTTPError(http.StatusBadRequest, response)
+	}
+
+	if err := validator.Struct(&user); err != nil {
+		response := response.BaseResponse{
+			Status:  "error",
+			Message: "Check your data",
+		}
+		return c.JSON(http.StatusBadRequest, response)
 	}
 
 	hash, _ := utils.HashAndSalt([]byte(user.Password))
@@ -68,6 +78,7 @@ func RegisterController(c echo.Context) error {
 func UpdateUserController(c echo.Context) error {
 	id := c.Param("id")
 	var user models.User
+	validator := validator.New()
 	var existingUser models.User
 	if err := c.Bind(&user); err != nil {
 		response := response.BaseResponse{
@@ -75,6 +86,14 @@ func UpdateUserController(c echo.Context) error {
 			Message: "Cek the user data",
 		}
 		return echo.NewHTTPError(http.StatusBadRequest, response)
+	}
+
+	if err := validator.Struct(&user); err != nil {
+		response := response.BaseResponse{
+			Status:  "error",
+			Message: "Check your data",
+		}
+		return c.JSON(http.StatusBadRequest, response)
 	}
 
 	err := repositories.FindUserById(&existingUser, id)
@@ -109,8 +128,24 @@ func UpdateUserController(c echo.Context) error {
 }
 
 func LoginController(ctx echo.Context) error {
+	validator := validator.New()
 	var user models.User
-	ctx.Bind(&user)
+
+	if err := ctx.Bind(&user).Error; err != nil {
+		response := response.BaseResponse{
+			Status:  "error",
+			Message: "Cek the user data",
+		}
+		return echo.NewHTTPError(http.StatusBadRequest, response)
+	}
+
+	if err := validator.Struct(&user); err != nil {
+		response := response.BaseResponse{
+			Status:  "error",
+			Message: "Check your data",
+		}
+		return ctx.JSON(http.StatusBadRequest, response)
+	}
 
 	var existingUser models.User
 	err := repositories.Login(&existingUser, user.Email)
