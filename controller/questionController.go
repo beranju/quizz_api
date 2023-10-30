@@ -19,10 +19,9 @@ func GetAllQuestionController(ctx echo.Context) error {
 	var questions []models.Question
 
 	if err := repositories.FindAllQuestion(&questions, quizId); err != nil {
-		response := response.ErrorResponse{
+		response := response.BaseResponse{
 			Status:  "error",
 			Message: "Failed to retrieve questions",
-			Error:   err.Error(),
 		}
 		return ctx.JSON(http.StatusInternalServerError, response)
 	}
@@ -33,7 +32,7 @@ func GetAllQuestionController(ctx echo.Context) error {
 		questionResponse = append(questionResponse, question)
 	}
 
-	response := response.SuccessResponse{
+	response := response.BaseResponse{
 		Status:  "success",
 		Message: "Questions retrieved successfully",
 		Data:    questionResponse,
@@ -64,10 +63,9 @@ func CreateQuestionController(ctx echo.Context) error {
 	}
 
 	if err := repositories.CreateQuestion(questions); err != nil {
-		response := response.ErrorResponse{
+		response := response.BaseResponse{
 			Status:  "error",
 			Message: "Question add Failed",
-			Error:   err.Error(),
 		}
 		return ctx.JSON(http.StatusInternalServerError, response)
 	}
@@ -75,7 +73,7 @@ func CreateQuestionController(ctx echo.Context) error {
 	// TODO: create method fo these requests
 	questionResponse := questions.ToQuestionResponse()
 
-	response := response.SuccessResponse{
+	response := response.BaseResponse{
 		Status:  "success",
 		Message: "Questions added successfully",
 		Data:    questionResponse,
@@ -195,7 +193,7 @@ func DeleteQuestionController(ctx echo.Context) error {
 		}
 		return echo.NewHTTPError(http.StatusInternalServerError, response)
 	}
-	response := response.SuccessResponse{
+	response := response.BaseResponse{
 		Status:  "success",
 		Message: "Question Deleted successfully",
 	}
