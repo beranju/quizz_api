@@ -5,7 +5,7 @@ import (
 	"main/models"
 	"os"
 
-	_"github.com/joho/godotenv"
+	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
