@@ -46,7 +46,7 @@ func RegisterController(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, response)
 	}
 
-	if err := validator.Struct(&user); err != nil {
+	if err := validator.Struct(user); err != nil {
 		response := response.BaseResponse{
 			Status:  "error",
 			Message: "Check your data",
@@ -88,7 +88,7 @@ func UpdateUserController(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, response)
 	}
 
-	if err := validator.Struct(&user); err != nil {
+	if err := validator.Struct(user); err != nil {
 		response := response.BaseResponse{
 			Status:  "error",
 			Message: "Check your data",
@@ -139,7 +139,7 @@ func LoginController(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, response)
 	}
 
-	if err := validator.Struct(&user); err != nil {
+	if err := validator.Struct(user); err != nil {
 		response := response.BaseResponse{
 			Status:  "error",
 			Message: "Check your data",

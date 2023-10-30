@@ -58,7 +58,7 @@ func CreateQuizController(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, response)
 	}
 
-	if err := validator.Struct(&quiz); err != nil {
+	if err := validator.Struct(quiz); err != nil {
 		response := response.BaseResponse{
 			Status:  "error",
 			Message: "Check your data",
@@ -129,7 +129,7 @@ func UpdateQuizController(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, response)
 	}
 
-	if err := validator.Struct(&quiz); err != nil {
+	if err := validator.Struct(quiz); err != nil {
 		response := response.BaseResponse{
 			Status:  "error",
 			Message: "Check your data",
