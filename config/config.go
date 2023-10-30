@@ -5,7 +5,7 @@ import (
 	"main/models"
 	"os"
 
-	"github.com/joho/godotenv"
+	_"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -31,12 +31,12 @@ func InitDb() {
 	InitMigrate()
 }
 
-func LoadEnv() {
-	err := godotenv.Load()
-	if err != nil {
-		panic("Error loading .env file")
-	}
-}
+// func LoadEnv() {
+// 	err := godotenv.Load()
+// 	if err != nil {
+// 		panic("Error loading .env file")
+// 	}
+// }
 
 func InitMigrate() {
 	DB.AutoMigrate(&models.User{})

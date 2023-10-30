@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	config.LoadEnv()
+	// config.LoadEnv()
 	config.InitDb()
 	e := routes.New()
 	e.Logger.Fatal(e.Start(":8080"))
