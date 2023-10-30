@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/labstack/echo-jwt/v4"
+	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -24,7 +24,7 @@ func New() *echo.Echo {
 	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
 
 	eAuth := e.Group("")
-	e.Use(echojwt.JWT([]byte(os.Getenv("JWT_SECRET_KEY"))))
+	eAuth.Use(echojwt.JWT([]byte(os.Getenv("JWT_SECRET_KEY"))))
 
 	e.POST("/users/register", controller.RegisterController)
 	e.POST("/users/login", controller.LoginController)
