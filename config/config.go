@@ -3,7 +3,6 @@ package config
 import (
 	"fmt"
 	"main/models"
-	"os"
 
 	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
@@ -13,21 +12,29 @@ import (
 var DB *gorm.DB
 
 func InitDb() {
-	// config := map[string]string{
-	// 	"DB_Username": "root",
-	// 	"DB_Password": "Akunmysql1@",
-	// 	"DB_Port":     "3306",
-	// 	"DB_Host":     "127.0.0.1",
-	// 	"DB_Name":     "quiz",
-	// }
+	config := map[string]string{
+		"DB_Username": "root",
+		"DB_Password": "Akunmysql1@",
+		"DB_Port":     "3306",
+		"DB_Host":     "127.0.0.1",
+		"DB_Name":     "quiz",
+	}
 
+	// connectionString :=
+	// 	fmt.Sprintf("%v:%v@tcp(%v:%v)/%v?charset=utf8&parseTime=True&loc=Local",
+	// 		os.Getenv("DB_USER"),
+	// 		os.Getenv("DB_PASSWORD"),
+	// 		os.Getenv("DB_HOST"),
+	// 		os.Getenv("DB_PORT"),
+	// 		os.Getenv("DB_NAME"),
+	// 	)
 	connectionString :=
 		fmt.Sprintf("%v:%v@tcp(%v:%v)/%v?charset=utf8&parseTime=True&loc=Local",
-			os.Getenv("DB_USER"),
-			os.Getenv("DB_PASSWORD"),
-			os.Getenv("DB_HOST"),
-			os.Getenv("DB_PORT"),
-			os.Getenv("DB_NAME"),
+			config["DB_Username"],
+			config["DB_Password"],
+			config["DB_Host"],
+			config["DB_Port"],
+			config["DB_Name"],
 		)
 
 	var e error

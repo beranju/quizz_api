@@ -137,9 +137,12 @@ func UpdateUserController(c echo.Context) error {
 
 func LoginController(ctx echo.Context) error {
 	validator := validator.New()
-	var user models.User
+	loginData := struct {
+		Email    string `json:"email" form:"email" validate:"required"`
+		Password string `json:"password" form:"password" validate:"required"`
+	}{}
 
-	if err := ctx.Bind(&user).Error; err != nil {
+	if err := ctx.Bind(&loginData); err != nil {
 		response := response.BaseResponse{
 			Status:  "error",
 			Message: "Cek the user data",
@@ -147,7 +150,7 @@ func LoginController(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, response)
 	}
 
-	if err := validator.Struct(user); err != nil {
+	if err := validator.Struct(loginData); err != nil {
 		response := response.BaseResponse{
 			Status:  "error",
 			Message: "Check your data",
@@ -156,7 +159,7 @@ func LoginController(ctx echo.Context) error {
 	}
 
 	var existingUser models.User
-	err := repositories.Login(&existingUser, user.Email)
+	err := repositories.Login(&existingUser, loginData.Email)
 	if err != nil {
 		response := response.BaseResponse{
 			Status:  "error",
@@ -165,7 +168,7 @@ func LoginController(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, response)
 	}
 
-	if passwordMatch := utils.ComparePassword(existingUser.Password, []byte(user.Password)); passwordMatch == false {
+	if passwordMatch := utils.ComparePassword(existingUser.Password, []byte(loginData.Password)); passwordMatch == false {
 		response := response.BaseResponse{
 			Status:  "error",
 			Message: "Password mismatch",

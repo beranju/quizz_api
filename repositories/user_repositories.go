@@ -6,7 +6,7 @@ import (
 )
 
 func FindUserById(user *models.User, id string) error {
-	result := config.DB.First(&user, id)
+	result := config.DB.Where("ID  = ?", id).First(&user, id)
 	return result.Error
 }
 
@@ -21,6 +21,6 @@ func Register(user *models.User) error {
 }
 
 func Login(user *models.User, email string) error {
-	result := config.DB.Where("email = ?", email).First(user)
+	result := config.DB.Where("email = ?", email).First(&user)
 	return result.Error
 }

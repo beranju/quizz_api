@@ -151,7 +151,7 @@ func UpdateQuizController(ctx echo.Context) error {
 	exisitingQuiz.Description = quiz.Description
 	exisitingQuiz.Duration = quiz.Duration
 
-	if err := repositories.SaveQuiz(quiz); err != nil {
+	if err := repositories.SaveQuiz(exisitingQuiz); err != nil {
 		response := response.BaseResponse{
 			Status:  "error",
 			Message: "Quiz Update Failed",
