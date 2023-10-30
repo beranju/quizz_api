@@ -7,6 +7,7 @@ import (
 	"main/repositories"
 	"main/utils"
 	"net/http"
+	"strings"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
@@ -59,6 +60,13 @@ func RegisterController(c echo.Context) error {
 
 	err := repositories.Register(&user)
 	if err != nil {
+		if strings.Contains(err.Error(), "unique constraint") {
+			response := response.BaseResponse{
+				Status:  "error",
+				Message: "email is already registered",
+			}
+			return c.JSON(http.StatusConflict, response)
+		}
 		response := response.BaseResponse{
 			Status:  "error",
 			Message: "User Creation Failed",

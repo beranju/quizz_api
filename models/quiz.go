@@ -6,8 +6,8 @@ import (
 
 type Quiz struct {
 	gorm.Model
-	QuizName    string     `json:"quiz_name" form:"quiz_name"`
-	Description string     `json:"description" form:"description"`
-	Duration    int64      `json:"duration" form:"duration"`
+	QuizName    string     `json:"quiz_name" gorm:"quiz_name;not null"`
+	Description string     `json:"description" gorm:"description;not null"`
+	Duration    int64      `json:"duration" gorm:"duration;not null"`
 	Question    []Question `gorm:"foreignKey:quiz_id"`
 }

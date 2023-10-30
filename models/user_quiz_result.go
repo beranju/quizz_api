@@ -8,9 +8,9 @@ import (
 
 type UserQuizResult struct {
 	gorm.Model
-	UserId    int64 `json:"user_id" form:"user_id"`
-	QuizId    int64 `json:"quiz_id" form:"quiz_id"`
-	UserScore int32 `json:"user_score" form:"user_score"`
+	UserId    int64 `json:"user_id" gorm:"user_id;not null"`
+	QuizId    int64 `json:"quiz_id" gorm:"quiz_id;not null"`
+	UserScore int32 `json:"user_score" gorm:"user_score;not null"`
 }
 
 func (result UserQuizResult) ToQuizResultResponse() response.QuizResultResponse {

@@ -8,15 +8,15 @@ import (
 
 type Question struct {
 	gorm.Model
-	QuizId   int64  `json:"quiz_id" form:"quiz_id"`
-	Text     string `json:"text" form:"text"`
-	Score    int64  `json:"score" form:"score"`
-	Answer   int32  `json:"answer" form:"answer"`
-	Options1 string `json:"options_1" form:"options_1"`
-	Options2 string `json:"options_2" form:"options_2"`
-	Options3 string `json:"options_3" form:"options_3"`
-	Options4 string `json:"options_4" form:"options_4"`
-	ImageUrl string `json:"image_url" form:"image_url"`
+	QuizId   int64  `json:"quiz_id" gorm:"quiz_id;not null"`
+	Text     string `json:"text" gorm:"text;not null"`
+	Score    int64  `json:"score" gorm:"score;not null"`
+	Answer   int32  `json:"answer" gorm:"answer;not null"`
+	Options1 string `json:"options_1" gorm:"options_1;not null"`
+	Options2 string `json:"options_2" gorm:"options_2;not null"`
+	Options3 string `json:"options_3" gorm:"options_3;not null"`
+	Options4 string `json:"options_4" gorm:"options_4;not null"`
+	ImageUrl string `json:"image_url" gorm:"image_url"`
 }
 
 func (question Question) ToQuestionResponse() response.QuestionResponse {
